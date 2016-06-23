@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="organbartlomiej">
 
-    <title>siłownia ozon - karnety</title>
+    <title>fitness club - karnety</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ url('/bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
