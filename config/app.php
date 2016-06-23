@@ -162,7 +162,7 @@ return [
          * 
          */
         Collective\Html\HtmlServiceProvider::class,
-        Barryvdh\Debugbar\ServiceProvider::class,
+        //Barryvdh\Debugbar\ServiceProvider::class,
         Prettus\Repository\Providers\RepositoryServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class
     ],
@@ -213,7 +213,7 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
         
-        'Debugbar'  => Barryvdh\Debugbar\Facade::class,
+        //'Debugbar'  => Barryvdh\Debugbar\Facade::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
