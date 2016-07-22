@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Customer\CustomerRepository;
 use App\Repositories\CustomerVoucher\CustomerVoucherRepository;
 use App\Acme\Vouchers\VoucherAppManager;
+use App\Criteria\Voucher\HaveExpiredAtDate;
 
 class VoucherController extends Controller
 {
@@ -32,13 +33,25 @@ class VoucherController extends Controller
     public function edit($customerId)
     {
         $customer = $this->customer->with('Voucher')->find($customerId);
-
-        $availableVouchers = $this->voucherManager->getAvailableVouchers(new \App\Acme\Vouchers\AvailableVoucherDropdown());
         
-        unset($availableVouchers[$customer->Voucher->customer_voucher_type]);
+        $vouchers = $this->getAllVouchers();
+        $availableVouchers = $this->removeVoucherFromVouchers($vouchers, $customer->Voucher->customer_voucher_type);;
         
         return view('panel.customer.editVoucher', compact('customer', 'availableVouchers'));
     }
+    
+    private function getAllVouchers()
+    {
+        return $this->voucherManager->getAvailableVouchers(new \App\Acme\Vouchers\AvailableVoucherDropdown());
+    }
+    
+    private function removeVoucherFromVouchers(array $vouchers, $voucherToRemove)
+    {
+        unset($vouchers[$voucherToRemove]);
+        
+        return $vouchers;
+    }
+    
     
     /**
      * 
@@ -49,15 +62,20 @@ class VoucherController extends Controller
     {
         $customer = $this->customer->with('Voucher')->find($request->get('id'));
         
-        if ($request->get('customer_voucher_type') == $customer->Voucher->customer_voucher_type) {
+        if ($this->isSelectedVoucherEqualCurrentVoucher($request->get('customer_voucher_type'), $customer->Voucher->customer_voucher_type)) {
             return back()->with('the_same_voucher_change', 'Selected voucher is the same as current customer voucher, select other voucher!!!');
         }            
                 
         $voucher = $this->voucherManager->getVoucherObject($request->get('customer_voucher_type'));
-        
         $this->customer->assignVoucher($request->all(), $voucher);
         
         return redirect(route('panel.customer.edit', $request->get('id')));
+    }
+    
+    
+    private function isSelectedVoucherEqualCurrentVoucher($selectedVoucher, $currentVoucher)
+    {
+        return $selectedVoucher == $currentVoucher;
     }
     
     /**
@@ -67,11 +85,8 @@ class VoucherController extends Controller
      */
     public function editExpiredAt($id)
     {
-        $voucher = $this->customerVoucher->scopeQuery(function($query) {
-            
-            return $query->whereNotNull('customer_voucher_expired_at');
-            
-        })->with('Customer')->find($id);
+        $this->customerVoucher->pushCriteria(new HaveExpiredAtDate());
+        $voucher = $this->customerVoucher->with('Customer')->find($id);
         
         return view('panel.customer.editVoucherExpiredAt', compact('voucher'));
     }
@@ -94,8 +109,9 @@ class VoucherController extends Controller
      */
     public function updatePayedAt($id)
     {
+        $voucher = $this->customerVoucher->find($id);
         $this->customerVoucher->update(['customer_voucher_payed_at' => date('Y-m-d H:i:s')], $id);
         
-        return back();
+        return redirect(route('panel.customer.edit', $voucher->customer_voucher_customer_id));
     }
 }

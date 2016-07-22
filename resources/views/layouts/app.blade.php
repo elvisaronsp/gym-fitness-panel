@@ -85,7 +85,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ url('/') }}">LOGO</a>
+                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ url('logo-cb2.png') }}" style="height: 50px; margin-top:-15px"></a>
             </div>
             <!-- /.navbar-header -->
 
@@ -111,6 +111,9 @@
                         </li>
                         <li>
                             <a href="{{ route('panel.customerSingleEntry.index') }}"><i class="fa fa-male fa-fw"></i> Wejścia jednorazowe</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('panel.product.index') }}"><i class="fa fa fa-table fa-fw"></i> Magazyn</a>
                         </li>
                         <li>
                             <a href="{{ route('panel.report.index') }}"><i class="fa fa-file-pdf-o fa-fw"></i> Raporty</a>

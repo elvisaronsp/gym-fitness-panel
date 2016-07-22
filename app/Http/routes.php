@@ -64,5 +64,22 @@ Route::group(['middleware' => 'web'], function () {
             Route::get('/', ['uses' => 'ReportController@index', 'as' => 'panel.report.index']);
             Route::any('generate', ['uses' => 'ReportController@generateReport', 'as' => 'panel.report.generate']);
         });
+        
+        Route::group(['prefix' => 'product'], function() {
+            Route::get('/', ['uses' => 'ProductController@index', 'as' => 'panel.product.index']);
+            Route::get('/create', ['uses' => 'ProductController@create', 'as' => 'panel.product.create']);
+            Route::post('/store', ['uses' => 'ProductController@store', 'as' => 'panel.product.store']);
+            Route::get('/edit/{id}', ['uses' => 'ProductController@edit', 'as' => 'panel.product.edit']);
+            Route::post('/update/{id}', ['uses' => 'ProductController@update', 'as' => 'panel.product.update']);
+            Route::get('/delete/{id}', ['uses' => 'ProductController@delete', 'as' => 'panel.product.delete']);
+        });
+        
+        Route::group(['prefix' => 'productWarehouse'], function() {
+            Route::get('/sell/{id}/{quantity?}', ['uses' => 'ProductWarehouseController@sell', 'as' => 'panel.productWarehouse.sell']);
+            Route::get('/correct/{id}/', ['uses' => 'ProductWarehouseController@getCorrect', 'as' => 'panel.productWarehouse.correct']);
+            Route::post('/storeCorrect', ['uses' => 'ProductWarehouseController@storeCorrect', 'as' => 'panel.productWarehouse.storeCorrect']);
+            Route::get('/adoption/{id}/', ['uses' => 'ProductWarehouseController@getAdoption', 'as' => 'panel.productWarehouse.adoption']);
+            Route::post('/storeAdoption', ['uses' => 'ProductWarehouseController@storeAdoption', 'as' => 'panel.productWarehouse.storeAdoption']);
+        });
     });
 });

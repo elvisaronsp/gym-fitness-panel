@@ -9,21 +9,24 @@ use App\Http\Controllers\Controller;
 
 use App\Repositories\Customer\CustomerRepository;
 use App\Repositories\CustomerVisit\CustomerVisitRepository;
-use App\Acme\Vouchers\VoucherAppManager;
+
 use App\Criteria\Customer\WithVisitVoucher;
+use App\Criteria\Customer\WasMoreThan;
 use App\Criteria\Customer\DefaultOrderBy;
 
 class CustomerVisitController extends Controller
 {
+    
+    const PER_PAGE = 35;
+    const REQUIRED_VISIT_COUNT = 0;
+    
     protected $customer = null;
-    protected $customersPerPage = 35;
     protected $voucherManager = null;
     protected $customerVisit = null;
     
-    public function __construct(CustomerRepository $customer, VoucherAppManager $voucherManager, CustomerVisitRepository $customerVisit)
+    public function __construct(CustomerRepository $customer, CustomerVisitRepository $customerVisit)
     {
         $this->customer = $customer;
-        $this->voucherManager = $voucherManager;
         $this->customerVisit = $customerVisit;
     }
     
@@ -34,12 +37,9 @@ class CustomerVisitController extends Controller
     public function index()
     {
         $this->customer->pushCriteria(new DefaultOrderBy());
-        $this->customer->pushCriteria(new WithVisitVoucher());    
-        $customers = $this->customer->scopeQuery(function($query) {
-            
-            return $query->where('customer_voucher_visit_limit', '>', 0);
-            
-        })->with('VisitVoucher')->all();
+        $this->customer->pushCriteria(new WithVisitVoucher());
+        $this->customer->pushCriteria(new WasMoreThan(self::REQUIRED_VISIT_COUNT));
+        $customers = $this->customer->with('VisitVoucher')->all();
 
         return view('panel.customerVisit.index', compact('customers'));
     }

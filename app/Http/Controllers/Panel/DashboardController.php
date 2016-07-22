@@ -9,7 +9,9 @@ use App\Http\Controllers\Controller;
 
 use App\Repositories\Customer\CustomerRepository;
 use App\Repositories\CustomerVisit\CustomerVisitRepository;
+
 use App\Criteria\Customer\DefaultOrderBy;
+use App\Criteria\CustomerVisit\OrderById;
 
 class DashboardController extends Controller
 {
@@ -24,22 +26,21 @@ class DashboardController extends Controller
     
     public function index()
     {
-        $this->customer->pushCriteria(new DefaultOrderBy());
-        $customers = $this->customer->allWithNotAvailableVouchers();
-        
-        $visits = $this->customerVisit->scopeQuery(function($query) {
-            
-            return $query->orderBy('customer_visit_id', 'DESC');
-            
-        })->with('Voucher')->all();
+        $customers = $this->getCustomers();
+        $visits = $this->getCustomersVisits();
         
         return view('panel.dashboard.index', compact('customers', 'visits'));
     }
     
-    public function makeAppCategories()
+    private function getCustomers()
     {
-        //kategorie cecha
-        $cecha = Category::find(1);
-        dd($cecha);
+        $this->customer->pushCriteria(new DefaultOrderBy());
+        return $this->customer->allWithNotAvailableVouchers();
+    }
+    
+    private function getCustomersVisits()
+    {
+        $this->customerVisit->pushCriteria(new OrderById(OrderById::SORT_DESC));
+        return $this->customerVisit->with('Voucher')->all();
     }
 }

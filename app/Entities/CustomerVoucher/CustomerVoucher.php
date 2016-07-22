@@ -50,11 +50,6 @@ class CustomerVoucher extends Model implements Transformable
         return count($this->Visits) ? array_sum($this->Visits->lists('customer_visit_quantity', 'customer_visit_id')->toArray()) : 0;
     }
     
-    public function hasExpiredDate()
-    {
-        return !is_null($this->customer_voucher_expired_at);
-    }
-    
     public function hasVisitsLimit()
     {
        return $this->customer_voucher_visit_limit > 0 ?: false; 
@@ -69,6 +64,16 @@ class CustomerVoucher extends Model implements Transformable
         return null;
     }
     
+    public function hasExpiredDate()
+    {
+        return !is_null($this->customer_voucher_expired_at);
+    }
+    
+    public function getVisitsAvailableInfo()
+    {
+        return $this->getVisitsUsed().' / '.$this->getVisitsAvailable();
+    }
+    
     public function getVisitsUsed()
     {
         return $this->getCustomerVoucherVisitUsed();
@@ -79,15 +84,28 @@ class CustomerVoucher extends Model implements Transformable
        return $this->customer_voucher_visit_limit; 
     }
     
-    public function getVisitsAvailableInfo()
+    public function hasVisitsAvailable()
     {
-        return $this->getVisitsUsed().' / '.$this->getVisitsAvailable();
+        return $this->hasVisits(self::VISITS_AVAILABLE);
     }
     
-    private function hasVisits($state = self::VISITS_AVAILABLE)
+    public function hasNoVisitsAvailable()
+    {
+        return $this->hasVisits(self::VISITS_NOAVAILABLE);
+    }
+    
+    public function hasVisits($availabilityType = self::VISITS_AVAILABLE)
     {
         if ($this->hasVisitsLimit()) {
-            switch ($state)
+            return $this->getVisitsByAbaialability($availabilityType);
+        }
+        
+        return false;
+    }
+    
+    public function getVisitsByAbaialability($availabilityType)
+    {
+             switch ($availabilityType)
             {
                 case self::VISITS_AVAILABLE :
                     $state = $this->getVisitsUsed() < $this->getVisitsAvailable() ?: false;
@@ -103,19 +121,6 @@ class CustomerVoucher extends Model implements Transformable
             }
             
             return $state;
-        }
-        
-        return false;
-    }
-    
-    public function hasVisitsAvailable()
-    {
-        return $this->hasVisits(self::VISITS_AVAILABLE);
-    }
-    
-    public function hasNoVisitsAvailable()
-    {
-        return $this->hasVisits(self::VISITS_NOAVAILABLE);
     }
     
     public function isPayed()

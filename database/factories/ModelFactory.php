@@ -62,3 +62,17 @@ $factory->defineAs(App\Entities\CustomerVoucher\CustomerVoucher::class, 'thirtyD
         'customer_voucher_expired_at' => \Carbon\Carbon::now()->addDays(30)->format('Y-m-d')
     ];
 });
+
+$factory->define(App\Entities\Product\Product::class, function (Faker\Generator $faker) {
+    return [
+        'product_name' => "Produkt " . $faker->firstName,
+        'product_created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s'),
+    ];
+});
+
+$factory->define(App\Entities\ProductWarehouse\ProductWarehouse::class, function (Faker\Generator $faker) {
+    return [
+        'product_warehouse_quantity' => rand(-1, 55),
+        'product_warehouse_created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+    ];
+});

@@ -11,6 +11,7 @@ use App\Acme\Reports\VoucherReport;
 
 class ReportController extends Controller
 {
+    const DATE_FORMAT = 'Y-m-d';
     
     protected $voucherReport = null;
     
@@ -46,8 +47,8 @@ class ReportController extends Controller
     {
         $now = \Carbon\Carbon::now();
         
-        $starDate = $now->firstOfMonth()->format('Y-m-d');
-        $endDate = $now->lastOfMonth()->format('Y-m-d');
+        $starDate = $now->firstOfMonth()->format(self::DATE_FORMAT);
+        $endDate = $now->lastOfMonth()->format(self::DATE_FORMAT);
         
         return view('panel.report.voucherReport', compact('starDate', 'endDate'));
     }

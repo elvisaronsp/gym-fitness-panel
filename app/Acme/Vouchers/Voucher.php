@@ -38,14 +38,19 @@ abstract class Voucher
      */
     public function setPayedAt($date)
     {
-        $format = $this->getDateTimeFormat();
-        $d = \DateTime::createFromFormat($format, $date);
-        
-        if (false === ($d && $d->format($format) == $date)) {
+        if ($this->isValidPayedAtDateFormat($date)) {
             throw new \App\Acme\Vouchers\VoucherException("Date must have format {$format}");
         }
         
         $this->payedAt = $date;
+    }
+    
+    protected function isValidPayedAtDateFormat($date)
+    {
+        $format = $this->getDateTimeFormat();
+        $d = \DateTime::createFromFormat($format, $date);
+        
+        return false === ($d && $d->format($format) == $date);
     }
     
     /**

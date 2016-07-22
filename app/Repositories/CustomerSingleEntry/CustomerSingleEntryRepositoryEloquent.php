@@ -8,6 +8,11 @@ use App\Repositories\CustomerSingleEntry\CustomerSingleEntryRepository;
 use App\Entities\CustomerSingleEntry\CustomerSingleEntry;
 use App\Validators\CustomerSingleEntry\CustomerSingleEntryValidator;
 
+use App\Criteria\CustomerSingleEntry\SumEntries;
+use App\Criteria\CustomerSingleEntry\CreatedAtBetweenAnd;
+use App\Criteria\CustomerSingleEntry\GroupByCreatedAtMonth;
+use App\Criteria\CustomerSingleEntry\OrderByCreatedAt;
+
 /**
  * Class CustomerSingleEntryRepositoryEloquent
  * @package namespace App\Repositories\CustomerSingleEntry;
@@ -32,5 +37,33 @@ class CustomerSingleEntryRepositoryEloquent extends BaseRepository implements Cu
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+    
+    public function summary()
+    {
+        $this->pushCriteria(new SumEntries());
+        
+        return $this;
+    }
+    
+    public function betweenCreatedAtDatesRange($start, $stop)
+    {
+        $this->pushCriteria(new CreatedAtBetweenAnd($start, $stop));
+        
+        return $this;
+    }
+    
+    public function groupByCreatedAtMonth()
+    {
+        $this->pushCriteria(new GroupByCreatedAtMonth());
+        
+        return $this;
+    }
+    
+    public function orderByCreatedAt()
+    {
+        $this->pushCriteria(new OrderByCreatedAt(OrderByCreatedAt::SORT_DESC));
+        
+        return $this;
     }
 }

@@ -93,14 +93,19 @@
                         Wejścia klientów
                     </div>
                     <div class="panel-body">
-                        <div class="list-group">
+                        <div style="height: 600px !important; overflow: scroll;">
+                        <table class="table table-customer table-striped table-bordered table-hover table-condensed">
                             @foreach ($visits as $visit)
-                            <a href="#" class="list-group-item" style="@if ($visit->Voucher->Customer->trashed()) text-decoration: line-through; color: red; fonr-weight: bold @endif">
-                                {{ $visit->Voucher->Customer->customer_name }} {{ $visit->Voucher->Customer->customer_surname }}
-                                <span class="pull-right text-muted small"><em>{{ $visit->customer_visit_created_at->format('Y-m-d H:i') }}, {{ $visit->customer_visit_quantity }} wizyta</em>
-                                </span>
-                            </a>
+                            <tr>
+                                <td>
+                                    {{ $visit->Voucher->Customer->customer_name }} {{ $visit->Voucher->Customer->customer_surname }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-muted small"><em>{{ $visit->customer_visit_created_at->format('Y-m-d H:i') }}, {{ $visit->customer_visit_quantity }} wizyta</em> </span>
+                                </td>
+                            </tr>
                             @endforeach
+                        </table>
                         </div>
                     </div>
                 </div>

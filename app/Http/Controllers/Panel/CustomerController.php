@@ -7,12 +7,16 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\Acme\Vouchers\VoucherAppManager;
 use App\Repositories\Customer\CustomerRepository;
 use App\Criteria\Customer\DefaultOrderBy;
-use App\Acme\Vouchers\VoucherAppManager;
+
 
 class CustomerController extends Controller
 {
+    
+    const FORM_CUSTOMER_VOUCHER_TYPE = 'customer_voucher_type';
+    
     protected $customer = null;
     protected $customersPerPage = 35;
     protected $voucherManager = null;
@@ -30,7 +34,7 @@ class CustomerController extends Controller
     public function index()
     {
         $this->customer->pushCriteria(new DefaultOrderBy());
-        $customers = $this->customer->with('Voucher')->all();
+        $customers = $this->customer->allWithVoucher();
         
         return view('panel.customer.index', compact('customers'));
     }
@@ -41,9 +45,14 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        $availableVouchers = $this->voucherManager->getAvailableVouchers(new \App\Acme\Vouchers\AvailableVoucherDropdown());
+        $availableVouchers = $this->getAvailableVouchersDropdown();
         
         return view('panel.customer.create', compact('availableVouchers'));
+    }
+    
+    private function getAvailableVouchersDropdown()
+    {
+        return $this->voucherManager->getAvailableVouchers(new \App\Acme\Vouchers\AvailableVoucherDropdown());
     }
     
     /**
@@ -53,8 +62,7 @@ class CustomerController extends Controller
      */
     public function store(\App\Http\Requests\StoreCustomerRequest $request)
     {
-        $voucher = $this->voucherManager->getVoucherObject($request->get('customer_voucher_type'));
-
+        $voucher = $this->voucherManager->getVoucherObject($request->get(self::FORM_CUSTOMER_VOUCHER_TYPE));
         $this->customer->createWithAssignVoucher($request->all(), $voucher);
         
         return redirect(route('panel.customer.index'));
@@ -67,6 +75,7 @@ class CustomerController extends Controller
     public function edit($id)
     {
         $customer = $this->customer->with('Vouchers')->find($id);
+        $availableVouchers = $this->getAvailableVouchersDropdown();
         
         return view('panel.customer.edit', compact('customer', 'availableVouchers'));
     }
@@ -103,11 +112,10 @@ class CustomerController extends Controller
      */
     public function storeRenewVoucher(Request $request)
     {
-        $voucher = $this->voucherManager->getVoucherObject($request->get('customer_voucher_type'));
-        
+        $voucher = $this->voucherManager->getVoucherObject($request->get(self::FORM_CUSTOMER_VOUCHER_TYPE));
         $this->customer->assignVoucher($request->all(), $voucher);
         
-        return redirect(route('panel.customer.index'));
+        return redirect(route('panel.customer.edit', $request->get('id')));
     }
     
     /**

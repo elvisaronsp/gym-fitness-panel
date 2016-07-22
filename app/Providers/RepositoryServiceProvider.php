@@ -27,5 +27,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind('App\Repositories\CustomerVoucher\CustomerVoucherRepository', 'App\Repositories\CustomerVoucher\CustomerVoucherRepositoryEloquent');
         $this->app->bind('App\Repositories\CustomerVisit\CustomerVisitRepository', 'App\Repositories\CustomerVisit\CustomerVisitRepositoryEloquent');
         $this->app->bind('App\Repositories\CustomerSingleEntry\CustomerSingleEntryRepository', 'App\Repositories\CustomerSingleEntry\CustomerSingleEntryRepositoryEloquent');
+        $this->app->bind('App\Repositories\Product\ProductRepository', 'App\Repositories\Product\ProductRepositoryEloquent');
+        $this->app->bind('App\Repositories\ProductWarehouse\ProductWarehouseRepository', 'App\Repositories\ProductWarehouse\ProductWarehouseRepositoryEloquent');
     }
 }

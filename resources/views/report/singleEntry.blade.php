@@ -24,7 +24,7 @@
                         @foreach ($entries as $entry)
                             <tr>
                                 <td class="text-center">
-                                    {{ $entry->customer_single_entry_created_at->format('Y-m-d') }}
+                                    {{ $entry->customer_single_entry_date }}
                                 </td>
                                 <td class="text-center">
                                     {{ $entry->customer_single_entry_sum }}

@@ -37,12 +37,11 @@ class SingleEntryReport implements ReportInterface
      */
     public function getEntries($startDate, $endDate)
     {
-        return $this->customerSingleEntry->scopeQuery(function($query) use ($startDate, $endDate) {
+        $this->customerSingleEntry->summary();
+        $this->customerSingleEntry->betweenCreatedAtDatesRange($startDate, $endDate);
+        $this->customerSingleEntry->groupByCreatedAtMonth();
+        $this->customerSingleEntry->orderByCreatedAt();
         
-            return $query->addSelect(\DB::raw('*, SUM(customer_single_entry_quantity) AS customer_single_entry_sum'))
-                    ->whereBetween(\DB::raw('DATE(customer_single_entry_created_at)'), [$startDate, $endDate])
-                    ->groupBy(\DB::raw('DATE(customer_single_entry_created_at)'))
-                    ->orderBy('customer_single_entry_created_at');
-        })->all();
+        return $this->customerSingleEntry->all();
     }
 }

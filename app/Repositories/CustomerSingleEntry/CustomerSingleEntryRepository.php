@@ -10,5 +10,8 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 interface CustomerSingleEntryRepository extends RepositoryInterface
 {
-    //
+    public function summary();
+    public function betweenCreatedAtDatesRange($start, $stop);
+    public function groupByCreatedAtMonth();
+    public function orderByCreatedAt();
 }

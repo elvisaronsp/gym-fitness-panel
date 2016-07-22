@@ -17,6 +17,7 @@ use DB;
  */
 class CustomerRepositoryEloquent extends BaseRepository implements CustomerRepository
 {
+    
     /**
      * Specify Model class name
      *
@@ -43,13 +44,21 @@ class CustomerRepositoryEloquent extends BaseRepository implements CustomerRepos
      */
     public function createWithAssignVoucher($data, Voucher $voucher)
     {
-        DB::transaction(function() use ($data, $voucher){
-            
-            $customer = $this->create($data);
-            $data['id'] = $customer->customer_id;
-            
-            $this->assignVoucher($data, $voucher);
+        $customer = $this->create($data);
+        $data[self::FORM_CUSTOMER_ID_INDEX] = $customer->customer_id;
+        $this->assignVoucher($data, $voucher);
+    }
+    
+    public function createWithAssignVoucherTransaction($data, Voucher $voucher)
+    {
+        return DB::transaction(function() use ($data, $voucher){
+            $this->createWithAssignVoucher($data, $voucher);
         });
+    }
+    
+    private function isCustomerVoucherPayed(array $data)
+    {
+        return isset($data[self::FORM_CUSTOMER_VOUCHER_PAYED_INDEX]) && $data[self::FORM_CUSTOMER_VOUCHER_PAYED_INDEX] != 0;
     }
     
     /**
@@ -59,11 +68,16 @@ class CustomerRepositoryEloquent extends BaseRepository implements CustomerRepos
      */
     public function assignVoucher($data, Voucher $voucher)
     {
-        if (isset($data['customer_voucher_payed']) && $data['customer_voucher_payed'] != 0) {
-            $voucher->setPayedAt(\Carbon\Carbon::now()->format('Y-m-d H:i:s'));
+        if ($this->isCustomerVoucherPayed($data)) {
+            $voucher->setPayedAt(\Carbon\Carbon::now()->format($voucher->getDateTimeFormat()));
         }
 
-        $voucher->assignToCustomer($data['id']);
+        $voucher->assignToCustomer($data[self::FORM_CUSTOMER_ID_INDEX]);
+    }
+    
+    public function allWithVoucher()
+    {
+        return $this->with('Voucher')->all();
     }
     
     /**
@@ -72,9 +86,7 @@ class CustomerRepositoryEloquent extends BaseRepository implements CustomerRepos
      */
     public function allWithNotAvailableVouchers()
     {
-        $all = $this->with('Voucher')->all();
-        
-        $filtered = $all->filter(function($item) {
+        $filtered = $this->allWithVoucher()->filter(function($item) {
             return $item->Voucher->isNotAvailableForUse();
         });
         
