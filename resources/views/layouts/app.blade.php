@@ -85,7 +85,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ url('logo-cb2.png') }}" style="height: 50px; margin-top:-15px"></a>
+                <a class="navbar-brand" href="{{ url('/') }}"></a>
             </div>
             <!-- /.navbar-header -->
 
